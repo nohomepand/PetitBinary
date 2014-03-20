@@ -1,9 +1,12 @@
 package petit.bin;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import petit.bin.anno.StructMember.MarkAction;
+import petit.bin.anno.Marker.MarkAction;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 
@@ -17,21 +20,15 @@ import petit.bin.sinks.BinaryOutput;
 public final class SerializationContext {
 	
 	/**
-	 * 名前付の位置マーカの名前の添え字を決定するもの
-	 */
-	private final Map<String, Integer> _pos_marker_indexer;
-	
-	/**
 	 * 名前付の位置マーカ(実体)
 	 */
-	private final Map<String, Integer> _pos_marker;
+	private final Map<String, EnumMap<MarkAction, List<Integer>>> _pos_marker;
 	
 	/**
 	 * 初期化
 	 */
 	public SerializationContext() {
-		_pos_marker_indexer = new HashMap<String, Integer>();
-		_pos_marker = new HashMap<String, Integer>();
+		_pos_marker = new HashMap<String, EnumMap<MarkAction,List<Integer>>>();
 	}
 	
 	/**
@@ -39,7 +36,7 @@ public final class SerializationContext {
 	 * 
 	 * @return 名前付の位置マーカ
 	 */
-	public final Map<String, Integer> getMarker() {
+	public final Map<String, EnumMap<MarkAction, List<Integer>>> getMarker() {
 		return _pos_marker;
 	}
 	
@@ -51,16 +48,18 @@ public final class SerializationContext {
 	 * @param position 位置
 	 */
 	public final void addMarker(final String marker, final MarkAction action, final int position) {
-		_pos_marker.put(indexedNextMarker(action.makeMarker(marker)), position);
-	}
-	
-	private final String indexedNextMarker(final String marker) {
-		Integer maybe_index = _pos_marker_indexer.get(marker);
-		if (maybe_index == null)
-			maybe_index = Integer.valueOf(0);
+		EnumMap<MarkAction, List<Integer>> maybe_marker = _pos_marker.get(marker);
+		if (maybe_marker == null) {
+			maybe_marker = new EnumMap<MarkAction, List<Integer>>(MarkAction.class);
+			_pos_marker.put(marker, maybe_marker);
+		}
 		
-		_pos_marker_indexer.put(marker, maybe_index + 1);
-		return marker + "." + maybe_index;
+		List<Integer> maybe_mark = maybe_marker.get(action);
+		if (maybe_mark == null) {
+			maybe_mark = new ArrayList<Integer>();
+			maybe_marker.put(action, maybe_mark);
+		}
+		maybe_mark.add(position);
 	}
 	
 }

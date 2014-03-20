@@ -3,6 +3,7 @@ import petit.bin.BinaryAccessor;
 import petit.bin.BinaryAccessorFactory;
 import petit.bin.SerializationContext;
 import petit.bin.StructByteOrder;
+import petit.bin.anno.Marker;
 import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
 import petit.bin.sinks.impl.InOutByteBuffer;
@@ -23,7 +24,8 @@ public abstract class BaseStruct {
 	
 	@Struct(byteOrder = StructByteOrder.NEUTRAL)
 	public static class SubA extends BaseStruct {
-		@StructMember(value = 3, marker = "Mark1")
+		@StructMember(3)
+		@Marker("Mark1")
 		private int subA1;
 		
 		@StructMember(4)

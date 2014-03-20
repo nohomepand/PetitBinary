@@ -8,6 +8,7 @@ import petit.bin.BinaryAccessor;
 import petit.bin.BinaryAccessorFactory;
 import petit.bin.SerializationContext;
 import petit.bin.StructByteOrder;
+import petit.bin.anno.Marker;
 import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
 import petit.bin.anno.array.ArraySizeByMethod;
@@ -42,7 +43,8 @@ public class StructExample {
 	 * デフォルトの {@literal @Int64} で読み書き<br />
 	 * 読み書き時に位置マーカをコンテキスト情報に生成する
 	 */
-	@StructMember(value = 1, marker = "marker_1")
+	@StructMember(1)
+	@Marker("marker_1")
 	protected long b2;
 	
 	/**

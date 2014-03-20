@@ -122,7 +122,7 @@ public abstract class ArraySizeIndicator {
 		
 		@Override
 		public int getArraySize(BinaryInput bi, Object src_inst, Field src_field) throws Exception {
-			return _size_field.getInt(src_inst) & 0xffffffff;
+			return (int) (_size_field.getLong(src_inst) & 0xffffffff);
 		}
 		
 	}

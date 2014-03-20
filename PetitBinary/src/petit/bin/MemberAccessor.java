@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.EnumSet;
 
-import petit.bin.anno.StructMember;
-import petit.bin.anno.StructMember.MarkAction;
+import petit.bin.anno.Marker;
+import petit.bin.anno.Marker.MarkAction;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 
@@ -44,10 +44,15 @@ public abstract class MemberAccessor {
 		_field = field;
 		_field.setAccessible(true);
 		
-		final StructMember struct_member = _field.getAnnotation(StructMember.class);
-		final String marker = struct_member.marker();
-		_pos_marker_name = marker.isEmpty() ? null : marker;	
-		_pos_marker_actions = EnumSet.copyOf(Arrays.asList(struct_member.markAction()));
+		if (_field.isAnnotationPresent(Marker.class)) {
+			final Marker struct_member = _field.getAnnotation(Marker.class);
+			final String marker = struct_member.value();
+			_pos_marker_name = marker.isEmpty() ? null : marker;	
+			_pos_marker_actions = EnumSet.copyOf(Arrays.asList(struct_member.markAction()));
+		} else {
+			_pos_marker_name = null;
+			_pos_marker_actions = null;
+		}
 	}
 	
 	/**
