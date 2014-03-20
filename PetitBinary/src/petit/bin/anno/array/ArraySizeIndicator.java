@@ -3,8 +3,6 @@ package petit.bin.anno.array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.xml.crypto.NoSuchMechanismException;
-
 import petit.bin.sinks.BinaryInput;
 import petit.bin.util.ReflectionUtil;
 import petit.bin.util.ReflectionUtil.VisibilityConstraint;
@@ -145,8 +143,9 @@ public abstract class ArraySizeIndicator {
 		 * 
 		 * @param declaringClass メソッドが定義されているクラス
 		 * @param annotation {@link ArraySizeByMethod} のインスタンス
+		 * @throws NoSuchMethodException 
 		 */
-		ArraySizeByMethodIndicator(Class<?> declaringClass, ArraySizeByMethod annotation) {
+		ArraySizeByMethodIndicator(Class<?> declaringClass, ArraySizeByMethod annotation) throws NoSuchMethodException {
 			final String method_name = annotation.value();
 			Method tmp_method = null;
 			for (final Method method
@@ -158,7 +157,7 @@ public abstract class ArraySizeIndicator {
 			}
 			
 			if (tmp_method == null)
-				throw new NoSuchMechanismException(
+				throw new NoSuchMethodException(
 						"Cannot find a size indicator method: [byte,short,int,long, or ? extends Number] " +
 						method_name + "(" + BinaryInput.class.getCanonicalName() + ", " + Object.class.getCanonicalName() + ", " + Field.class.getCanonicalName() + ")");
 			_size_method = tmp_method;
