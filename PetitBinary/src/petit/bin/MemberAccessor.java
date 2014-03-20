@@ -66,6 +66,7 @@ public abstract class MemberAccessor {
 		if (ctx != null) {
 			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.BEFORE_READING))
 				ctx.addMarker(_pos_marker_name, MarkAction.BEFORE_READING, src.position());
+			ctx.beforeRead(inst, _field, src);
 		}
 		
 		_readFrom(ctx, inst, src);
@@ -73,6 +74,7 @@ public abstract class MemberAccessor {
 		if (ctx != null) {
 			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.AFTER_READ))
 				ctx.addMarker(_pos_marker_name, MarkAction.AFTER_READ, src.position());
+			ctx.afterRead(inst, _field, src);
 		}
 	}
 	
@@ -96,6 +98,7 @@ public abstract class MemberAccessor {
 		if (ctx != null) {
 			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.BEFORE_WRITING))
 				ctx.addMarker(_pos_marker_name, MarkAction.BEFORE_WRITING, dst.position());
+			ctx.beforeWrite(inst, _field, dst);
 		}
 		
 		_writeTo(ctx, inst, dst);
@@ -103,6 +106,7 @@ public abstract class MemberAccessor {
 		if (ctx != null) {
 			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.AFTER_WRITTEN))
 				ctx.addMarker(_pos_marker_name, MarkAction.AFTER_WRITTEN, dst.position());
+			ctx.afterWrite(inst, _field, dst);
 		}
 	}
 	

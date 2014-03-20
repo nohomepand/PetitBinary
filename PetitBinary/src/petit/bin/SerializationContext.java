@@ -1,5 +1,6 @@
 package petit.bin;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import petit.bin.sinks.BinaryOutput;
  * @since 2014/03/19 PetitBinarySerialization
  *
  */
-public final class SerializationContext {
+public class SerializationContext {
 	
 	/**
 	 * 名前付の位置マーカ(実体)
@@ -61,5 +62,54 @@ public final class SerializationContext {
 		}
 		maybe_mark.add(position);
 	}
+	
+	/**
+	 * handles before reading field<br />
+	 * default operation: do nothing
+	 * 
+	 * @param inst an instance
+	 * @param field a field of the instance
+	 * @param in source
+	 */
+	protected void beforeRead(final Object inst, final Field field, final BinaryInput in) {
+		return;
+	}
+	
+	/**
+	 * handles after reading field<br />
+	 * default operation: do nothing
+	 * 
+	 * @param inst an instance
+	 * @param field a field of the instance
+	 * @param in source
+	 */
+	protected void afterRead(final Object inst, final Field field, final BinaryInput in) {
+		return;
+	}
+	
+	/**
+	 * handles before writing field<br />
+	 * default operation: do nothing
+	 * 
+	 * @param inst an instance
+	 * @param field a field of the instance
+	 * @param out destination
+	 */
+	protected void beforeWrite(final Object inst, final Field field, final BinaryOutput out) {
+		return;
+	}
+	
+	/**
+	 * handles after writing field<br />
+	 * default operation: do nothing
+	 * 
+	 * @param inst an instance
+	 * @param field a field of the instance
+	 * @param out destination
+	 */
+	protected void afterWrite(final Object inst, final Field field, final BinaryOutput out) {
+		return;
+	}
+	
 	
 }
