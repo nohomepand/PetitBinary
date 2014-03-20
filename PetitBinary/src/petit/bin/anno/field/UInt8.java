@@ -37,12 +37,12 @@ public @interface UInt8 {
 		
 		@Override
 		protected void _readFrom(SerializationContext ctx, Object inst, BinaryInput src) throws IOException, IllegalArgumentException, IllegalAccessException {
-			_field.setShort(inst, (short) (src.readInt8() & 0xff));
+			_field.setInt(inst, (int) (src.readInt8() & 0xff));
 		}
 		
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
-			dst.writeInt8((byte) _field.getShort(inst)); // TODO 大丈夫？
+			dst.writeInt8((byte) _field.getInt(inst)); // TODO 大丈夫？
 		}
 		
 	}

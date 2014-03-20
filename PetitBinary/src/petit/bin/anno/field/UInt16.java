@@ -34,7 +34,7 @@ public @interface UInt16 {
 		
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
-			dst.writeInt16(_field.getShort(inst)); // TODO 大丈夫？
+			dst.writeInt16((short) _field.getInt(inst));
 		}
 		
 	}

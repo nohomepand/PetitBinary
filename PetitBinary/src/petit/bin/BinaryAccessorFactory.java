@@ -236,7 +236,7 @@ public final class BinaryAccessorFactory {
 		Class<? extends Annotation> field_anno_clazz = null;
 		MemberAccessorFactory maf = null;
 		for (final Annotation anno : field.getAnnotations()) {
-			final Class<? extends Annotation> anno_clazz = anno.getClass();
+			final Class<? extends Annotation> anno_clazz = anno.annotationType();
 			if (_supported_annotation_memberaccessorfactory_map.containsKey(anno_clazz)) {
 				field_anno_clazz = anno_clazz;
 				maf = _supported_annotation_memberaccessorfactory_map.get(anno_clazz);

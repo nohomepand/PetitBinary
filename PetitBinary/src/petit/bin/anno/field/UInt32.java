@@ -33,7 +33,7 @@ public @interface UInt32 {
 		
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
-			dst.writeInt64(_field.getLong(inst));
+			dst.writeInt32((int) (_field.getLong(inst) & 0xffffffffL));
 		}
 		
 	}
