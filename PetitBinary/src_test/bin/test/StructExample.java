@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 
 import petit.bin.BinaryAccessor;
 import petit.bin.BinaryAccessorFactory;
+import petit.bin.SerializationContext;
 import petit.bin.StructByteOrder;
 import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
@@ -193,23 +194,28 @@ public class StructExample {
 		showBuffer(write_buf.getFlippedShallowCopy());
 		
 		final InOutByteBuffer read_buf = new InOutByteBuffer(write_buf.getFlippedShallowCopy());
-		final StructExample read = ba.readFrom(null, read_buf);
+		final SerializationContext ctx = new SerializationContext();
+		final StructExample read = ba.readFrom(ctx, read_buf);
 		System.out.println("Read b1=" + read.b1);
 		System.out.println("Read b2=" + read.b2);
 		System.out.println("Read b3=" + read.b3);
 		System.out.println("Read b4=" + read.b4.get());
+		System.out.println("marker: " + ctx.getMarker());
 	}
 	
 	private static final void testSubStruct(final BinaryAccessorFactory baf) throws Exception {
 		final BinaryAccessor<SubStruct> ba = baf.getBinaryAccessor(SubStruct.class);
 		final InOutByteBuffer write_buf = new InOutByteBuffer();
+		final SerializationContext ctx = new SerializationContext();
 		final SubStruct written = new SubStruct(1, 2, -1, "hoge");
 		
-		ba.writeTo(null, written, write_buf);
+		ba.writeTo(ctx, written, write_buf);
+		System.out.println("marker: " + ctx.getMarker());
 		
 		showBuffer(write_buf.getFlippedShallowCopy());
 		
 		final InOutByteBuffer read_buf = new InOutByteBuffer(write_buf.getFlippedShallowCopy());
+		
 		final StructExample read = ba.readFrom(null, read_buf);
 		System.out.println("Read b1=" + read.b1);
 		System.out.println("Read b2=" + read.b2);

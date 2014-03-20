@@ -3,6 +3,7 @@ package petit.bin;
 import java.util.HashMap;
 import java.util.Map;
 
+import petit.bin.anno.StructMember.MarkAction;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 
@@ -43,23 +44,14 @@ public final class SerializationContext {
 	}
 	
 	/**
-	 * 読み込み位置として，名前付の位置マーカを追加する
+	 * 名前付の位置マーカを追加する
 	 * 
 	 * @param marker 名前
+	 * @param action マークアクション
 	 * @param position 位置
 	 */
-	public final void addReadMarker(final String marker, final int position) {
-		_pos_marker.put(indexedNextMarker(marker + ".r"), position);
-	}
-	
-	/**
-	 * 書き込み位置として，名前付の位置マーカを追加する
-	 * 
-	 * @param marker 名前
-	 * @param position 位置
-	 */
-	public final void addWriteMarker(final String marker, final int position) {
-		_pos_marker.put(indexedNextMarker(marker + ".w"), position);
+	public final void addMarker(final String marker, final MarkAction action, final int position) {
+		_pos_marker.put(indexedNextMarker(action.makeMarker(marker)), position);
 	}
 	
 	private final String indexedNextMarker(final String marker) {

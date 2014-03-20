@@ -2,8 +2,11 @@ package petit.bin;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.EnumSet;
 
 import petit.bin.anno.StructMember;
+import petit.bin.anno.StructMember.MarkAction;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 
@@ -28,6 +31,11 @@ public abstract class MemberAccessor {
 	protected final String _pos_marker_name;
 	
 	/**
+	 * 位置マーカを書き込むタイミング
+	 */
+	protected final EnumSet<MarkAction> _pos_marker_actions;
+	
+	/**
 	 * 初期化
 	 * 
 	 * @param field フィールド
@@ -36,8 +44,10 @@ public abstract class MemberAccessor {
 		_field = field;
 		_field.setAccessible(true);
 		
-		final String marker = _field.getAnnotation(StructMember.class).marker();
-		_pos_marker_name = marker.isEmpty() ? null : marker;
+		final StructMember struct_member = _field.getAnnotation(StructMember.class);
+		final String marker = struct_member.marker();
+		_pos_marker_name = marker.isEmpty() ? null : marker;	
+		_pos_marker_actions = EnumSet.copyOf(Arrays.asList(struct_member.markAction()));
 	}
 	
 	/**
@@ -49,11 +59,16 @@ public abstract class MemberAccessor {
 	 */
 	public final void readFrom(final SerializationContext ctx, final Object inst, final BinaryInput src) throws IllegalArgumentException, IOException, IllegalAccessException {
 		if (ctx != null) {
-			if (_pos_marker_name != null)
-				ctx.addReadMarker(_pos_marker_name, src.position());
+			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.BEFORE_READING))
+				ctx.addMarker(_pos_marker_name, MarkAction.BEFORE_READING, src.position());
 		}
 		
 		_readFrom(ctx, inst, src);
+		
+		if (ctx != null) {
+			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.AFTER_READ))
+				ctx.addMarker(_pos_marker_name, MarkAction.AFTER_READ, src.position());
+		}
 	}
 	
 	/**
@@ -74,11 +89,16 @@ public abstract class MemberAccessor {
 	 */
 	public final void writeTo(final SerializationContext ctx, final Object inst, final BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
 		if (ctx != null) {
-			if (_pos_marker_name != null)
-				ctx.addWriteMarker(_pos_marker_name, dst.position());
+			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.BEFORE_WRITING))
+				ctx.addMarker(_pos_marker_name, MarkAction.BEFORE_WRITING, dst.position());
 		}
 		
 		_writeTo(ctx, inst, dst);
+		
+		if (ctx != null) {
+			if (_pos_marker_name != null && _pos_marker_actions.contains(MarkAction.AFTER_WRITTEN))
+				ctx.addMarker(_pos_marker_name, MarkAction.AFTER_WRITTEN, dst.position());
+		}
 	}
 	
 	/**
