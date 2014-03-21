@@ -114,18 +114,36 @@ public final class BinaryAccessor<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public final T readFrom(final SerializationContext ctx, final BinaryInput src) throws InstantiationException, IllegalArgumentException, IOException, IllegalAccessException {
+		return readFrom((T) createTargetObject(), ctx, src);
+	}
+	
+	/**
+	 * 既に生成されたインスタンスに対し，読み込み元から構造体のフィールドを読み込み，そのインスタンスを返す
+	 * 
+	 * @param constructed 既に生成されたインスタンス
+	 * @param ctx コンテキスト情報
+	 * @param src 読み込み元
+	 * @return constructed そのもの
+	 * @throws InstantiationException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 */
+	public final T readFrom(final T constructed, final SerializationContext ctx, final BinaryInput src) throws InstantiationException, IllegalArgumentException, IOException, IllegalAccessException {
+		if (constructed == null)
+			throw new NullPointerException("constructed must not be null");
+		
 		final StructByteOrder bo = _clazz_struct_anno.byteOrder();
 		if (bo != StructByteOrder.NEUTRAL)
 			src.pushByteOrder(_clazz_struct_anno.byteOrder());
 		
-		final Object ao = createTargetObject();
 		for (final MemberAccessor ma : _struct_fields)
-			ma.readFrom(ctx, ao, src);
+			ma.readFrom(ctx, constructed, src);
 		
 		if (bo != StructByteOrder.NEUTRAL)
 			src.popByteOrder();
 		
-		return (T) ao;
+		return constructed;
 	}
 	
 	/**
