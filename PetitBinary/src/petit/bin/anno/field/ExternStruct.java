@@ -89,7 +89,16 @@ public @interface ExternStruct {
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException {
 			try {
-				_fields_type_ba.writeTo(ctx, _field.get(inst), dst);
+				final Object obj = _field.get(inst);
+				if (obj == null)
+					throw new NullPointerException("Cannot write null field: " + _field + " is null");
+				
+				if (_resolver != null) {
+					final BinaryAccessor ba = _ba_fac.getBinaryAccessor(obj.getClass());
+					ba.writeTo(ctx, obj, dst);
+				} else {
+					_fields_type_ba.writeTo(ctx, obj, dst);
+				}
 			} catch (Exception e) {
 				throw new IOException(e);
 			}

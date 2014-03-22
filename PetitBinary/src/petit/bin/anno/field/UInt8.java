@@ -42,7 +42,7 @@ public @interface UInt8 {
 		
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
-			dst.writeInt8((byte) _field.getShort(inst)); // TODO 大丈夫？
+			dst.writeInt8((byte) _field.getLong(inst)); // TODO 大丈夫？
 		}
 		
 	}

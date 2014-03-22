@@ -52,7 +52,7 @@ public @interface CharArray {
 		public _MA(final BinaryAccessorFactory ba_fac, final Field f) throws Exception {
 			super(f);
 			final CharArray ca_anno = f.getAnnotation(CharArray.class);
-			if (ca_anno.value() == null)
+			if (ca_anno == null || ca_anno.value() == null)
 				_str_cs = Charset.defaultCharset();
 			else
 				_str_cs = Charset.forName(ca_anno.value());

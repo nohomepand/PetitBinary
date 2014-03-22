@@ -47,7 +47,7 @@ public @interface Float32Array {
 		
 		@Override
 		protected void _writeTo(SerializationContext ctx, Object inst, BinaryOutput dst) throws IOException, IllegalArgumentException, IllegalAccessException {
-			final short[] ar = (short[]) _field.get(inst);
+			final float[] ar = (float[]) _field.get(inst);
 			if (ar == null)
 				return;
 			
