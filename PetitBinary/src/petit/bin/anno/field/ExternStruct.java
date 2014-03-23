@@ -6,18 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
 
 import petit.bin.BinaryAccessor;
 import petit.bin.BinaryAccessorFactory;
 import petit.bin.MemberAccessor;
 import petit.bin.SerializationContext;
+import petit.bin.anno.FieldObjectInstantiator;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
-import petit.bin.util.ReflectionUtil;
-import petit.bin.util.ReflectionUtil.VisibilityConstraint;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
@@ -42,23 +38,19 @@ public @interface ExternStruct {
 		
 		private final BinaryAccessor _fields_type_ba;
 		
-		private final Method _resolver;
+		private final FieldObjectInstantiator _instor;
 		
-		public _MA(final BinaryAccessorFactory ba_fac, final Field field) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+		public _MA(final BinaryAccessorFactory ba_fac, final Field field) throws Exception {
 			super(field);
 			_ba_fac = ba_fac;
 			
-			final String method_name;
-			if (!field.isAnnotationPresent(ExternStruct.class) || (method_name = field.getAnnotation(ExternStruct.class).value()) == null) {
-				_fields_type_ba = ba_fac.getBinaryAccessor(field.getType());
-				_resolver = null;
-			} else {
+			final ExternStruct anno = field.getAnnotation(ExternStruct.class);
+			if (anno != null && anno.value() != null) {
+				_instor = FieldObjectInstantiator.getResolver(field.getType(), field.getDeclaringClass(), anno.value());
 				_fields_type_ba = null;
-				final List<Method> found_methods = ReflectionUtil.getVisibleMethods(field.getDeclaringClass(), VisibilityConstraint.INHERITED_CLASS_VIEWPOINT, method_name, null, Object.class, Field.class);
-				if (found_methods.isEmpty())
-					throw new IllegalArgumentException("Cannot find concrete class resolver method: Class " + method_name + "(Object, Field)");
-				_resolver = found_methods.get(0);
-				_resolver.setAccessible(true);
+			} else {
+				_instor = FieldObjectInstantiator.getResolver(field.getType(), null, null);
+				_fields_type_ba = ba_fac.getBinaryAccessor(field.getType());
 			}
 		}
 		
@@ -66,20 +58,14 @@ public @interface ExternStruct {
 		@Override
 		protected void _readFrom(SerializationContext ctx, Object inst, BinaryInput src) throws IOException {
 			try {
-				if (_resolver != null) {
-					final BinaryAccessor ba;
-					final Object fields_instance = _resolver.invoke(inst, inst, _field);
-					if (fields_instance == null)
-						throw new IOException("Cannot create a concrete class instance(resolver method returns null)");
-					
-					ba = _ba_fac.getBinaryAccessor(fields_instance.getClass());
-					if (ba == null)
-						throw new IOException("Concrete class resolver method returns null");
-					_field.set(inst, ba.readFrom(fields_instance, ctx, src));
-				} else {
-					_field.set(inst, _fields_type_ba.readFrom(ctx, src));
-				}
+				final Object object = _instor.getConcreteClassInstance(inst, inst, _field);
 				
+				if (_fields_type_ba == null) {
+					final BinaryAccessor<Object> ba = _ba_fac.getBinaryAccessor(object.getClass());
+					_field.set(inst, ba.readFrom(ctx, object, src));
+				} else {
+					_field.set(inst, _fields_type_ba.readFrom(ctx, object, src));
+				}
 			} catch (Exception e) {
 				throw new IOException(e);
 			}
@@ -93,7 +79,7 @@ public @interface ExternStruct {
 				if (obj == null)
 					throw new NullPointerException("Cannot write null field: " + _field + " is null");
 				
-				if (_resolver != null) {
+				if (_fields_type_ba == null) {
 					final BinaryAccessor ba = _ba_fac.getBinaryAccessor(obj.getClass());
 					ba.writeTo(ctx, obj, dst);
 				} else {

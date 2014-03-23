@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import petit.bin.anno.array.ArraySizeIndicator.ArraySizeByFieldIndicator;
+import petit.bin.anno.ArraySizeIndicator.ArraySizeByFieldIndicator;
 
 /**
  * Type: int なフィールドでサイズが指定された配列であることを指示する

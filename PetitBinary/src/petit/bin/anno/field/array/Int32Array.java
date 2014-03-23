@@ -10,9 +10,9 @@ import java.lang.reflect.Field;
 import petit.bin.BinaryAccessorFactory;
 import petit.bin.MemberAccessor;
 import petit.bin.SerializationContext;
+import petit.bin.anno.ArraySizeIndicator;
 import petit.bin.anno.DefaultFieldAnnotationType;
 import petit.bin.anno.SupportType;
-import petit.bin.anno.array.ArraySizeIndicator;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 

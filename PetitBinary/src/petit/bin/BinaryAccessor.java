@@ -10,7 +10,7 @@ import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
-import petit.bin.util.InstanceConstructor;
+import petit.bin.util.Instantiator;
 import petit.bin.util.ReflectionUtil;
 import petit.bin.util.ReflectionUtil.VisibilityConstraint;
 
@@ -28,7 +28,7 @@ public final class BinaryAccessor<T> {
 	
 	private final Class<? extends T> _clazz;
 	
-	private final InstanceConstructor _ctor;
+	private final Instantiator _ctor;
 	
 	private final Struct _clazz_struct_anno;
 	
@@ -50,7 +50,7 @@ public final class BinaryAccessor<T> {
 		
 		_factory = factory;
 		_clazz = clazz;
-		_ctor = ReflectionUtil.getNullaryConstructor(clazz);
+		_ctor = ReflectionUtil.getInstantiator(clazz);
 		
 		_clazz_struct_anno = _clazz.getAnnotation(Struct.class);
 		_struct_fields = new ArrayList<MemberAccessor>();
@@ -114,22 +114,22 @@ public final class BinaryAccessor<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public final T readFrom(final SerializationContext ctx, final BinaryInput src) throws InstantiationException, IllegalArgumentException, IOException, IllegalAccessException {
-		return readFrom((T) createTargetObject(), ctx, src);
+		return readFrom(ctx, (T) createTargetObject(), src);
 	}
 	
 	/**
 	 * 既に生成されたインスタンスに対し，読み込み元から構造体のフィールドを読み込み，そのインスタンスを返す
-	 * 
-	 * @param constructed 既に生成されたインスタンス
 	 * @param ctx コンテキスト情報
+	 * @param constructed 既に生成されたインスタンス
 	 * @param src 読み込み元
+	 * 
 	 * @return constructed そのもの
 	 * @throws InstantiationException
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 * @throws IllegalAccessException
 	 */
-	public final T readFrom(final T constructed, final SerializationContext ctx, final BinaryInput src) throws InstantiationException, IllegalArgumentException, IOException, IllegalAccessException {
+	public final T readFrom(final SerializationContext ctx, final T constructed, final BinaryInput src) throws InstantiationException, IllegalArgumentException, IOException, IllegalAccessException {
 		if (constructed == null)
 			throw new NullPointerException("constructed must not be null");
 		

@@ -295,12 +295,12 @@ public final class ReflectionUtil {
 	 * @param clazz クラス
 	 * @return clazz のインスタンスを構築可能な方法，または構築可能な方法がなければ null
 	 */
-	public static final InstanceConstructor getNullaryConstructor(final Class<?> clazz) {
+	public static final Instantiator getInstantiator(final Class<?> clazz) {
 		try {
-			return new NullaryConstructor(clazz);
+			return new NullaryInstantiator(clazz);
 		} catch (Exception e) {
-			if (UnsafeConstructor.isAvailable())
-				return new UnsafeConstructor(clazz);
+			if (UnsafeInstantiator.isAvailable())
+				return new UnsafeInstantiator(clazz);
 			else
 				return null;
 		}

@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import petit.bin.anno.array.ArraySizeIndicator.ArraySizeByMethodIndicator;
+import petit.bin.anno.ArraySizeIndicator.ArraySizeByMethodIndicator;
 
 /**
  * 固定サイズな配列であることを指示する

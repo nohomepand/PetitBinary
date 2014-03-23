@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @since 2014/03/17 PetitBinarySerialization
  *
  */
-final class UnsafeConstructor extends InstanceConstructor {
+final class UnsafeInstantiator extends Instantiator {
 	
 	private static Object UNSAFE;
 	
@@ -30,9 +30,9 @@ final class UnsafeConstructor extends InstanceConstructor {
 	}
 	
 	/**
-	 * {@link UnsafeConstructor} が利用可能かどうか
+	 * {@link UnsafeInstantiator} が利用可能かどうか
 	 * 
-	 * @return {@link UnsafeConstructor} が利用可能な場合は true
+	 * @return {@link UnsafeInstantiator} が利用可能な場合は true
 	 */
 	public static final boolean isAvailable() {
 		return UNSAFE != null;
@@ -42,9 +42,9 @@ final class UnsafeConstructor extends InstanceConstructor {
 	 * 初期化
 	 * 
 	 * @param clazz クラス
-	 * @throws IllegalStateException UnsafeConstructor が利用可能出ない場合
+	 * @throws IllegalStateException UnsafeInstantiator が利用可能出ない場合
 	 */
-	public UnsafeConstructor(final Class<?> clazz) throws IllegalStateException {
+	public UnsafeInstantiator(final Class<?> clazz) throws IllegalStateException {
 		super(clazz);
 		if (!isAvailable())
 			throw new IllegalStateException();

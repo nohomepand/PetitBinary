@@ -6,7 +6,6 @@ import petit.bin.StructByteOrder;
 import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
 import petit.bin.anno.array.ArraySizeByField;
-import petit.bin.anno.array.ArraySizeByMethod;
 import petit.bin.anno.array.ArraySizeConstant;
 
 /**
@@ -25,30 +24,37 @@ public final class Example02 extends AbstractExample {
 	
 	@StructMember(1)
 	@ArraySizeConstant(5)
+	// default member annotation: @Int8Array
 	private byte[] _byte_array;
 	
 	@StructMember(2)
 	@ArraySizeConstant(10)
+	// default member annotation: @Int16Array
 	private short[] _short_array;
 	
 	@StructMember(3)
 	@ArraySizeByField("_size_field")
+	// default member annotation: @CharArray
 	private char[] _char_array;
 	
 	@StructMember(4)
 	@ArraySizeConstant(10)
+	// default member annotation: @Int32Array
 	private int[] _int_array;
 	
 	@StructMember(5)
 	@ArraySizeByField("_size_field")
+	// default member annotation: @Int64Array
 	private long[] _long_array;
 	
 	@StructMember(6)
 	@ArraySizeByField("_size_field")
+	// default member annotation: @Float32Array
 	private float[] _float_array;
 	
 	@StructMember(7)
 	@ArraySizeByField("_size_field")
+	// default member annotation: @Float64Array
 	private double[] _double_array;
 	
 	public static void main(String[] args) {

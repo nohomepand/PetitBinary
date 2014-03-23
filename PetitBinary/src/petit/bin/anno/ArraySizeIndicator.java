@@ -1,8 +1,11 @@
-package petit.bin.anno.array;
+package petit.bin.anno;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import petit.bin.anno.array.ArraySizeByField;
+import petit.bin.anno.array.ArraySizeByMethod;
+import petit.bin.anno.array.ArraySizeConstant;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.util.ReflectionUtil;
 import petit.bin.util.ReflectionUtil.VisibilityConstraint;

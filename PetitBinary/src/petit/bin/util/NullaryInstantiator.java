@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
  * @since 2014/03/17 PetitBinarySerialization
  *
  */
-final class NullaryConstructor extends InstanceConstructor {
+final class NullaryInstantiator extends Instantiator {
 	
 	private final Constructor<?> _ctor;
 	
@@ -21,7 +21,7 @@ final class NullaryConstructor extends InstanceConstructor {
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 */
-	public NullaryConstructor(final Class<?> clazz) throws SecurityException, NoSuchMethodException {
+	public NullaryInstantiator(final Class<?> clazz) throws SecurityException, NoSuchMethodException {
 		super(clazz);
 		_ctor = clazz.getConstructor();
 		_ctor.setAccessible(true);

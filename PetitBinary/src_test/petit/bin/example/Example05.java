@@ -26,10 +26,18 @@ public final class Example05 extends AbstractExample {
 	@ExternStruct("unionMemberResolver")
 	private Object _union_member;
 	
-	private final Object unionMemberResolver(final Object inst, final Field f) {
+//	before 2014/03/23 PetitBinary ver.(this type of signature is also acceptable)
+//	private final Object unionMemberResolver(final Object inst, final Field f) {
+//		switch (_type) {
+//		case 0: return new Example04.StringWithLength("");
+//		case 1: return new Example04.NullTerminatedString("");
+//		default: throw new RuntimeException("Unsupported type " + _type);
+//		}
+//	}
+	private final Class<?> unionMemberResolver() {
 		switch (_type) {
-		case 0: return new Example04.StringWithLength("");
-		case 1: return new Example04.NullTerminatedString("");
+		case 0: return Example04.StringWithLength.class;
+		case 1: return Example04.NullTerminatedString.class;
 		default: throw new RuntimeException("Unsupported type " + _type);
 		}
 	}

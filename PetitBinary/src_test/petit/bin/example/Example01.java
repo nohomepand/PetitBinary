@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import petit.bin.StructByteOrder;
 import petit.bin.anno.Struct;
 import petit.bin.anno.StructMember;
-import petit.bin.anno.field.UInt16;
-import petit.bin.anno.field.UInt32;
 
 /**
  * An example of primitive types
@@ -19,28 +17,36 @@ import petit.bin.anno.field.UInt32;
 @Struct(byteOrder = StructByteOrder.NEUTRAL)
 public class Example01 extends AbstractExample {
 	
-	@StructMember(0)
+	@StructMember(0) // Index of a structure member begins 0
+	// default member annotation: @Int8Boolean 
 	private boolean _boolean;
 	
 	@StructMember(1)
+	// default member annotation: @Int8
 	private byte _byte;
 	
 	@StructMember(2)
+	// default member annotation: @Int16
 	private short _short;
 	
 	@StructMember(3)
+	// default member annotation: @UInt16
 	private char _char;
 	
 	@StructMember(4)
+	// default member annotation: @Int32
 	private int _int;
 	
 	@StructMember(5)
+	// default member annotation: @Int64
 	private long _long;
 	
 	@StructMember(6)
+	// default member annotation: @Float32
 	private float _float;
 	
 	@StructMember(7)
+	// default member annotation: @Float64
 	private double _double;
 	
 	/**

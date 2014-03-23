@@ -7,7 +7,7 @@ package petit.bin.util;
  * @since 2014/03/17 PetitBinarySerialization
  *
  */
-public abstract class InstanceConstructor {
+public abstract class Instantiator {
 	
 	/**
 	 * 対象のクラス
@@ -19,7 +19,7 @@ public abstract class InstanceConstructor {
 	 * 
 	 * @param clazz クラス
 	 */
-	public InstanceConstructor(final Class<?> clazz) {
+	public Instantiator(final Class<?> clazz) {
 		_clazz = clazz;
 	}
 	
