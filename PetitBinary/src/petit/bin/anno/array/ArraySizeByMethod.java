@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
-import petit.bin.anno.ArraySizeIndicator.ArraySizeByMethodIndicator;
 import petit.bin.sinks.BinaryInput;
 
 /**

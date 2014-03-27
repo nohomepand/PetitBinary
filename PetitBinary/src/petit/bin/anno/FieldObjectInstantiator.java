@@ -65,7 +65,7 @@ public abstract class FieldObjectInstantiator {
 					} else {
 						return new WrappedInstantiator_FullArguments(method);
 					}
-				} else {
+				} else if (method.getParameterTypes().length == 0) {
 					if (method.getReturnType().equals(Class.class)) {
 						return new InstantiatorWithConcreteClassResolver(method);
 					} else {

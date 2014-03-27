@@ -2,6 +2,7 @@ package petit.bin.example;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -124,13 +125,37 @@ public abstract class AbstractExample {
 				field.setAccessible(true);
 				final Object ao_field = field.get(ao);
 				final Object obj_field = field.get(obj);
+				
 				System.out.println(field.getDeclaringClass().getCanonicalName() + "#" + field.getName() +
-						" : " + ((ao_field == null ? obj_field == null : ao_field.equals(obj_field)) ? "ok" : (ao_field + " != " + obj_field)));
+						" : " + (objectEquals(ao_field, obj_field) ? "ok" : (ao_field + " != " + (obj_field.getClass().isArray() ? Arrays.toString((Object[])obj_field) : obj_field.toString()))));
 			}
 			return buf.getFlippedShallowCopy();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("Exception caused while checking read/write object", e);
 		}
+	}
+	
+	/**
+	 * Java7ならObjectsにありそうなオブジェクト同士の比較
+	 * 
+	 * @param x オブジェクト１
+	 * @param y オブジェクト２
+	 * @return オブジェクト１と オブジェクト２が実効的に同値なら true
+	 */
+	public static final boolean objectEquals(final Object x, final Object y) {
+		if (x == null) {
+			return y == null;
+		} else if (x.getClass().isArray()) {
+			final int size;
+			if (!y.getClass().isArray() || (size = Array.getLength(x)) != Array.getLength(y))
+				return false;
+			for (int i = 0; i < size; i++)
+				if (!objectEquals(Array.get(x, i), Array.get(y, i)))
+					return false;
+			return true;
+		} else
+			return x.equals(y);
 	}
 	
 }

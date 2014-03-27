@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import petit.bin.StructByteOrder;
 import petit.bin.anno.Struct;
@@ -91,9 +92,17 @@ public final class Example04 extends AbstractExample {
 		
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof StringWithLength) return get().equals(((StringWithLength) obj).get());
+			if (obj instanceof StringWithLength) return Arrays.equals(_string, ((StringWithLength) obj)._string);
 			else if (obj instanceof NullTerminatedString) return get().equals(((NullTerminatedString) obj).get());
 			else return false;
+		}
+		
+		@Override
+		public String toString() {
+			if (_string == null)
+				return "null";
+			else
+				return get();
 		}
 		
 	}
@@ -153,8 +162,16 @@ public final class Example04 extends AbstractExample {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof StringWithLength) return get().equals(((StringWithLength) obj).get());
-			else if (obj instanceof NullTerminatedString) return get().equals(((NullTerminatedString) obj).get());
+			else if (obj instanceof NullTerminatedString) return Arrays.equals(_string, ((NullTerminatedString) obj)._string);
 			else return false;
+		}
+		
+		@Override
+		public String toString() {
+			if (_string == null)
+				return "null";
+			else
+				return get();
 		}
 		
 	}

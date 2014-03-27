@@ -60,7 +60,9 @@ public @interface ExternStruct {
 			try {
 				final Object object = _instor.getConcreteClassInstance(inst, inst, _field);
 				
-				if (_fields_type_ba == null) {
+				if (object == null) {
+					_field.set(inst, null);
+				} else if (_fields_type_ba == null) {
 					final BinaryAccessor<Object> ba = _ba_fac.getBinaryAccessor(object.getClass());
 					_field.set(inst, ba.readFrom(ctx, object, src));
 				} else {

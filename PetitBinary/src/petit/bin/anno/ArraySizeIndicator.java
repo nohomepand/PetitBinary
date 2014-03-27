@@ -35,9 +35,36 @@ public abstract class ArraySizeIndicator {
 		else if (field.isAnnotationPresent(ArraySizeByField.class))
 			return new ArraySizeByFieldIndicator(field.getDeclaringClass(), field.getAnnotation(ArraySizeByField.class));
 		else if (field.isAnnotationPresent(ArraySizeByMethod.class))
-			return new ArraySizeByMethodIndicator(field.getDeclaringClass(), field.getAnnotation(ArraySizeByMethod.class));
+			return getByMethodIndicatorResolver(field.getDeclaringClass(), field.getAnnotation(ArraySizeByMethod.class));
 		else
 			throw new UnsupportedOperationException("No specified array size indicator");
+	}
+	
+	private static final ArraySizeIndicator getByMethodIndicatorResolver(final Class<?> declaring_clazz, final ArraySizeByMethod array_size_by_method_anno) throws NoSuchMethodException {
+		if (array_size_by_method_anno == null)
+			throw new NullPointerException("Array size method name is not assigned");
+		final String method_name = array_size_by_method_anno.value();
+		
+		// find method: signature [byte, short, int, long, or ? extends Number](BinaryInput)
+		for (final Method method 
+				: ReflectionUtil.getVisibleMethods(declaring_clazz, VisibilityConstraint.INHERITED_CLASS_VIEWPOINT, method_name, null, BinaryInput.class)) {
+			if (!isIndicatorType(method.getReturnType()))
+				continue;
+			method.setAccessible(true);
+			return new ArraySizeByMethodIndicator_BinaryInput(method);
+		}
+		
+		// find method: signature [byte, short, int, long, or ? extends Number](BinaryInput, Object, Field)
+		for (final Method method
+				: ReflectionUtil.getVisibleMethods(declaring_clazz, VisibilityConstraint.INHERITED_CLASS_VIEWPOINT, method_name, null, BinaryInput.class, Object.class, Field.class)) {
+			if (!isIndicatorType(method.getReturnType()))
+				continue;
+			method.setAccessible(true);
+			return new ArraySizeByMethodIndicator_BinaryInput_Object_Field(method);
+		}
+		
+		throw new NoSuchMethodException("Cannot find a size indicator method: [byte,short,int,long, or ? extends Number] " +
+				method_name + "(" + BinaryInput.class.getCanonicalName() + ") or (" + BinaryInput.class.getCanonicalName() + ", " + Object.class.getCanonicalName() + ", " + Field.class.getCanonicalName() + ")");
 	}
 	
 	private static final boolean isIndicatorType(final Class<?> c) {
@@ -78,7 +105,7 @@ public abstract class ArraySizeIndicator {
 		 * 
 		 * @param annotation {@link ArraySizeConstant} のインスタンス
 		 */
-		ArraySizeConstantIndicator(ArraySizeConstant annotation) {
+		private ArraySizeConstantIndicator(ArraySizeConstant annotation) {
 			_size = annotation.value();
 		}
 		
@@ -107,7 +134,7 @@ public abstract class ArraySizeIndicator {
 		 * @param annotation {@link ArraySizeByField} のインスタンス
 		 * @throws NoSuchFieldException
 		 */
-		ArraySizeByFieldIndicator(Class<?> declaringClass, ArraySizeByField annotation) throws NoSuchFieldException {
+		private ArraySizeByFieldIndicator(Class<?> declaringClass, ArraySizeByField annotation) throws NoSuchFieldException {
 			final String field_name = annotation.value();
 			Field tmp_field = null;
 			for (final Field field : ReflectionUtil.getVisibleFields(declaringClass, VisibilityConstraint.INHERITED_CLASS_VIEWPOINT, field_name, null)) {
@@ -131,13 +158,13 @@ public abstract class ArraySizeIndicator {
 	}
 	
 	/**
-	 * メソッドによってサイズが指定されるもの
+	 * signature: [byte, short, int, long, or ? extends Number] [method name](BinaryInput) なメソッドによってサイズが指定されるもの
 	 * 
 	 * @author 俺用
 	 * @since 2014/03/20 PetitBinarySerialization
 	 *
 	 */
-	public static final class ArraySizeByMethodIndicator extends ArraySizeIndicator {
+	public static final class ArraySizeByMethodIndicator_BinaryInput extends ArraySizeIndicator {
 		
 		private final Method _size_method;
 		
@@ -148,23 +175,37 @@ public abstract class ArraySizeIndicator {
 		 * @param annotation {@link ArraySizeByMethod} のインスタンス
 		 * @throws NoSuchMethodException 
 		 */
-		ArraySizeByMethodIndicator(Class<?> declaringClass, ArraySizeByMethod annotation) throws NoSuchMethodException {
-			final String method_name = annotation.value();
-			Method tmp_method = null;
-			for (final Method method
-					: ReflectionUtil.getVisibleMethods(declaringClass, VisibilityConstraint.INHERITED_CLASS_VIEWPOINT, method_name, null, BinaryInput.class, Object.class, Field.class)) {
-				if (!isIndicatorType(method.getReturnType()))
-					continue;
-				tmp_method = method;
-				break;
-			}
-			
-			if (tmp_method == null)
-				throw new NoSuchMethodException(
-						"Cannot find a size indicator method: [byte,short,int,long, or ? extends Number] " +
-						method_name + "(" + BinaryInput.class.getCanonicalName() + ", " + Object.class.getCanonicalName() + ", " + Field.class.getCanonicalName() + ")");
-			_size_method = tmp_method;
-			_size_method.setAccessible(true);
+		private ArraySizeByMethodIndicator_BinaryInput(final Method method) {
+			_size_method = method;
+		}
+		
+		@Override
+		public int getArraySize(BinaryInput bi, Object src_inst, Field src_field) throws Exception {
+			return ((Number) _size_method.invoke(src_inst, bi)).intValue();
+		}
+		
+	}
+	
+	/**
+	 * signature: [byte, short, int, long, or ? extends Number] [method name](BinaryInput, Object, Field) なメソッドによってサイズが指定されるもの
+	 * 
+	 * @author 俺用
+	 * @since 2014/03/20 PetitBinarySerialization
+	 *
+	 */
+	public static final class ArraySizeByMethodIndicator_BinaryInput_Object_Field extends ArraySizeIndicator {
+		
+		private final Method _size_method;
+		
+		/**
+		 * 初期化
+		 * 
+		 * @param declaringClass メソッドが定義されているクラス
+		 * @param annotation {@link ArraySizeByMethod} のインスタンス
+		 * @throws NoSuchMethodException 
+		 */
+		private ArraySizeByMethodIndicator_BinaryInput_Object_Field(final Method method) {
+			_size_method = method;
 		}
 		
 		@Override

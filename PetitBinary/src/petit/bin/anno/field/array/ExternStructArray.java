@@ -13,6 +13,7 @@ import petit.bin.BinaryAccessorFactory;
 import petit.bin.MemberAccessor;
 import petit.bin.SerializationContext;
 import petit.bin.anno.ArraySizeIndicator;
+import petit.bin.anno.FieldObjectInstantiator;
 import petit.bin.sinks.BinaryInput;
 import petit.bin.sinks.BinaryOutput;
 
@@ -20,22 +21,43 @@ import petit.bin.sinks.BinaryOutput;
 @Target(ElementType.FIELD)
 public @interface ExternStructArray {
 	
+	/**
+	 * Specifies a component type resolver method which is used to resolve a concrete type of this field's component type.
+	 * 
+	 * @return name of the component type resolver method
+	 */
+	public abstract String value();
+	
 	public static final class _MA extends MemberAccessor {
+		
+		private final ArraySizeIndicator _size_ind;
+		
+		private final BinaryAccessorFactory _ba_fac;
 		
 		private final Class<?> _component_type;
 		
 		@SuppressWarnings("rawtypes")
 		private final BinaryAccessor _component_type_ba;
 		
-		private final ArraySizeIndicator _size_ind;
+		private final FieldObjectInstantiator _component_instor;
 		
 		public _MA(final BinaryAccessorFactory ba_fac, final Field f) throws Exception {
 			super(f);
-			_component_type = f.getType().getComponentType();
-			_component_type_ba = ba_fac.getBinaryAccessor(_component_type);
 			_size_ind = ArraySizeIndicator.getArraySizeIndicator(f);
+			_ba_fac = ba_fac;
+			_component_type = f.getType().getComponentType();
+			
+			final ExternStructArray esa = f.getAnnotation(ExternStructArray.class);
+			if (esa != null && esa.value() != null) {
+				_component_instor = FieldObjectInstantiator.getResolver(_component_type, f.getDeclaringClass(), esa.value());
+				_component_type_ba = null;
+			} else {
+				_component_instor = FieldObjectInstantiator.getResolver(_component_type, null, null);
+				_component_type_ba = ba_fac.getBinaryAccessor(_component_type);
+			}
 		}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void _readFrom(SerializationContext ctx, Object inst, BinaryInput src) throws IOException, IllegalArgumentException, IllegalAccessException {
 			try {
@@ -43,7 +65,18 @@ public @interface ExternStructArray {
 				Object ar = _field.get(inst);
 				if (ar == null || Array.getLength(ar) != size)
 					ar = Array.newInstance(_component_type, size);
-				for (int i = 0; i < size; Array.set(ar, i++, _component_type_ba.readFrom(ctx, src)));
+				
+				for (int i = 0; i < size; i++) {
+					Object component_inst = _component_instor.getConcreteClassInstance(inst, inst, _field);
+					if (component_inst == null) {
+						Array.set(ar, i, null);
+					} else if (_component_type_ba != null) {
+						Array.set(ar, i, _component_type_ba.readFrom(ctx, component_inst, src));
+					} else {
+						Array.set(ar, i, _ba_fac.getBinaryAccessor(component_inst.getClass()).readFrom(ctx, component_inst, src));
+					}
+					
+				}
 				_field.set(inst, ar);
 			} catch (Exception e) {
 				throw new IOException(e);
@@ -57,7 +90,23 @@ public @interface ExternStructArray {
 				final Object[] ar = (Object[]) _field.get(inst);
 				if (ar == null)
 					return;
-				for (int i = 0; i < ar.length; _component_type_ba.writeTo(ctx, ar[i++], dst));
+				
+				for (int i = 0; i < ar.length; i++) {
+					if (ar[i] == null)
+						continue;
+					else if (_component_type_ba != null) {
+						_component_type_ba.writeTo(ctx, ar[i], dst);
+					} else {
+						_ba_fac.getBinaryAccessor(ar[i].getClass()).writeTo(ctx, ar[i], dst);
+					}
+				}
+//				if (_fields_type_ba == null) {
+//					final BinaryAccessor ba = _ba_fac.getBinaryAccessor(obj.getClass());
+//					ba.writeTo(ctx, obj, dst);
+//				} else {
+//					_fields_type_ba.writeTo(ctx, obj, dst);
+//				}
+//				for (int i = 0; i < ar.length; _component_type_ba.writeTo(ctx, ar[i++], dst));
 			} catch (Exception e) {
 				throw new IOException(e);
 			}
