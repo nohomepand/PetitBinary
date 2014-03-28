@@ -119,10 +119,10 @@ public final class BinaryAccessor<T> {
 	
 	/**
 	 * 既に生成されたインスタンスに対し，読み込み元から構造体のフィールドを読み込み，そのインスタンスを返す
+	 * 
 	 * @param ctx コンテキスト情報
 	 * @param constructed 既に生成されたインスタンス
 	 * @param src 読み込み元
-	 * 
 	 * @return constructed そのもの
 	 * @throws InstantiationException
 	 * @throws IllegalArgumentException
@@ -157,8 +157,6 @@ public final class BinaryAccessor<T> {
 	 * @throws IllegalAccessException
 	 */
 	public final void writeTo(final SerializationContext ctx, final T ao, final BinaryOutput dst) throws IllegalArgumentException, IOException, IllegalAccessException {
-//		if (ao == null)
-//			return;
 		if (ao == null)
 			throw new NullPointerException(_clazz.getCanonicalName() + " is null");
 		
